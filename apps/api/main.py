@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from core.config import get_settings
+from agents.discovery_agent import discover_jobs
 
 settings = get_settings()
 
@@ -30,3 +31,8 @@ def health_check():
         "status": "healthy",
         "environment": settings.environment,
     }
+
+@app.get("/agents/discover")
+async def run_discovery(query: str = "data scientist", location: str = "pk"):
+    jobs = await discover_jobs(query=query, location=location)
+    return {"count": len(jobs), "jobs": jobs}
