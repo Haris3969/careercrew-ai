@@ -5,6 +5,7 @@ from agents.discovery_agent import discover_jobs
 from agents.analyzer_agent import analyze_match
 from agents.resume_agent import tailor_resume
 from agents.cover_letter_agent import generate_cover_letter
+from agents.ats_agent import score_ats_compatibility
 
 settings = get_settings()
 
@@ -88,3 +89,11 @@ async def run_cover_letter(
         "tone_used": tone,
         "cover_letter": letter,
     }
+
+@app.post("/agents/ats-score")
+async def run_ats_score(job_description: str):
+    with open("data/sample_resume.txt", "r", encoding="utf-8") as f:
+        resume_text = f.read()
+
+    result = await score_ats_compatibility(resume_text, job_description)
+    return result
