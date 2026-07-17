@@ -9,6 +9,9 @@ from agents.ats_agent import score_ats_compatibility
 from agents.interview_agent import generate_interview_prep
 from agents.tracker_agent import update_job_status, get_jobs_by_status
 from agents.supervisor_graph import pipeline
+from fastapi import UploadFile, File
+from pydantic import BaseModel
+from services.resume_parser import parse_resume_file
 
 
 settings = get_settings()
@@ -127,24 +130,24 @@ async def list_jobs(status: str | None = None):
     jobs = await get_jobs_by_status(status)
     return {"count": len(jobs), "jobs": jobs}
 
-@app.post("/pipeline/run")
-async def run_full_pipeline(
-    job_description: str,
-    company_name: str = "the company",
-    role_title: str = "the position",
-    tone: str = "formal",
-    external_id: str | None = None,
-):
-    with open("data/sample_resume.txt", "r", encoding="utf-8") as f:
-        resume_text = f.read()
 
+class PipelineRequest(BaseModel):
+    resume_text: str
+    job_description: str
+    company_name: str = "the company"
+    role_title: str = "the position"
+    tone: str = "formal"
+    external_id: str | None = None
+
+@app.post("/pipeline/run")
+async def run_full_pipeline(request: PipelineRequest):
     initial_state = {
-        "resume_text": resume_text,
-        "job_description": job_description,
-        "company_name": company_name,
-        "role_title": role_title,
-        "tone": tone,
-        "external_id": external_id,
+        "resume_text": request.resume_text,
+        "job_description": request.job_description,
+        "company_name": request.company_name,
+        "role_title": request.role_title,
+        "tone": request.tone,
+        "external_id": request.external_id,
         "match_score": None,
         "missing_keywords": None,
         "tailored_resume": None,
@@ -157,3 +160,16 @@ async def run_full_pipeline(
     final_state = await pipeline.ainvoke(initial_state)
     return final_state
 
+
+@app.post("/resume/parse")
+async def parse_resume(file: UploadFile = File(...)):
+    file_bytes = await file.read()
+    try:
+        resume_text = parse_resume_file(file.filename, file_bytes)
+    except ValueError as e:
+        return {"error": str(e)}
+
+    if not resume_text or len(resume_text.strip()) < 20:
+        return {"error": "Could not extract readable text from this file. Try a different format or a text-based PDF (not scanned)."}
+
+    return {"resume_text": resume_text, "filename": file.filename}
