@@ -3,16 +3,24 @@
 import { useState } from "react";
 import JobManifest from "@/components/JobManifest";
 import FlightPlan from "@/components/FlightPlan";
-import { JobListing, PipelineResult } from "@/lib/api";
+import ResumeUpload from "@/components/ResumeUpload";
 import ResultsDossier from "@/components/ResultsDossier";
+import { JobListing, PipelineResult } from "@/lib/api";
 
 export default function Home() {
   const [selectedJob, setSelectedJob] = useState<JobListing | null>(null);
   const [pipelineResult, setPipelineResult] = useState<PipelineResult | null>(null);
+  const [resumeText, setResumeText] = useState<string | null>(null);
+  const [resumeFilename, setResumeFilename] = useState<string | null>(null);
 
   const handleSelectJob = (job: JobListing) => {
     setSelectedJob(job);
     setPipelineResult(null);
+  };
+
+  const handleResumeReady = (text: string, filename: string) => {
+    setResumeText(text || null);
+    setResumeFilename(filename || null);
   };
 
   return (
@@ -30,11 +38,32 @@ export default function Home() {
         </div>
       </header>
 
-      <div className="max-w-[1400px] mx-auto px-8 py-8 grid grid-cols-[1fr_420px] gap-6">
+      <div className="max-w-[1400px] mx-auto px-8 pt-8">
+        <div className="border border-hairline bg-panel rounded-lg p-6 mb-6">
+          <div className="text-[10px] font-mono uppercase tracking-widest text-text-muted mb-3">
+            Step 1 — Upload Your Resume
+          </div>
+          <ResumeUpload
+            onResumeReady={handleResumeReady}
+            resumeText={resumeText}
+            filename={resumeFilename}
+          />
+        </div>
+      </div>
+
+      <div className="max-w-[1400px] mx-auto px-8 pb-8 grid grid-cols-[1fr_420px] gap-6">
         <JobManifest onSelectJob={handleSelectJob} selectedJobId={selectedJob?.id} />
 
         <div className="border border-hairline bg-panel rounded-lg p-6">
-          {selectedJob ? (
+          {!resumeText ? (
+            <p className="text-text-muted font-mono text-xs text-center py-12">
+              [ UPLOAD RESUME TO BEGIN ]
+            </p>
+          ) : !selectedJob ? (
+            <p className="text-text-muted font-mono text-xs text-center py-12">
+              [ SELECT A JOB FROM THE MANIFEST ]
+            </p>
+          ) : (
             <div>
               <div className="text-[10px] font-mono uppercase tracking-widest text-text-muted mb-2">
                 Selected Target
@@ -46,21 +75,21 @@ export default function Home() {
                 {selectedJob.company} — {selectedJob.location}
               </p>
 
-              <FlightPlan job={selectedJob} onComplete={setPipelineResult} />
+              <FlightPlan
+                job={selectedJob}
+                resumeText={resumeText}
+                onComplete={setPipelineResult}
+              />
             </div>
-          ) : (
-            <p className="text-text-muted font-mono text-xs text-center py-12">
-              [ SELECT A JOB FROM THE MANIFEST ]
-            </p>
           )}
         </div>
       </div>
 
-{pipelineResult && (
-  <div className="max-w-[1400px] mx-auto px-8 pb-8">
-    <ResultsDossier result={pipelineResult} />
-  </div>
-)}
+      {pipelineResult && (
+        <div className="max-w-[1400px] mx-auto px-8 pb-8">
+          <ResultsDossier result={pipelineResult} />
+        </div>
+      )}
     </main>
   );
 }

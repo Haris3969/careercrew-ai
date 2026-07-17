@@ -59,13 +59,24 @@ export async function fetchJobs(status?: string) {
   return res.data;
 }
 
+export async function uploadResume(file: File): Promise<{ resume_text?: string; filename?: string; error?: string }> {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const res = await api.post(`/resume/parse`, formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  return res.data;
+}
+
 export async function runPipeline(params: {
+  resume_text: string;
   job_description: string;
   company_name: string;
   role_title: string;
   tone: string;
   external_id?: string;
 }) {
-  const res = await api.post(`/pipeline/run`, null, { params });
+  const res = await api.post(`/pipeline/run`, params);
   return res.data as PipelineResult;
 }

@@ -15,9 +15,11 @@ const STAGES = [
 
 export default function FlightPlan({
   job,
+  resumeText,
   onComplete,
 }: {
   job: JobListing;
+  resumeText: string;
   onComplete: (result: PipelineResult) => void;
 }) {
   const [running, setRunning] = useState(false);
@@ -45,14 +47,14 @@ export default function FlightPlan({
       });
     }, 3500);
 
-    try {
-      const result = await runPipeline({
-        job_description: job.description,
-        company_name: companyName,
-        role_title: roleTitle,
-        tone,
-        external_id: job.external_id.trim(),
-      });
+    try {const result = await runPipeline({
+  resume_text: resumeText,
+  job_description: job.description,
+  company_name: companyName,
+  role_title: roleTitle,
+  tone,
+  external_id: job.external_id.trim(),
+});
 
       clearInterval(stageInterval);
       setCompletedStages([0, 1, 2, 3, 4, 5]);
