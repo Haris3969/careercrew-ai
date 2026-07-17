@@ -23,7 +23,11 @@ allowed_origins = [origin.strip() for origin in settings.frontend_url.split(",")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=allowed_origins,
+    allow_origins=[
+        "http://localhost:3000",
+        "https://careercrew-ai.vercel.app",   # your production domain
+    ],
+    allow_origin_regex=r"https://.*\.vercel\.app",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
