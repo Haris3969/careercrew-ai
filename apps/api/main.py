@@ -8,6 +8,8 @@ from agents.cover_letter_agent import generate_cover_letter
 from agents.ats_agent import score_ats_compatibility
 from agents.interview_agent import generate_interview_prep
 from agents.tracker_agent import update_job_status, get_jobs_by_status
+from agents.supervisor_graph import pipeline
+
 
 settings = get_settings()
 
@@ -118,3 +120,34 @@ async def set_job_status(external_id: str, new_status: str, match_score: float |
 async def list_jobs(status: str | None = None):
     jobs = await get_jobs_by_status(status)
     return {"count": len(jobs), "jobs": jobs}
+
+@app.post("/pipeline/run")
+async def run_full_pipeline(
+    job_description: str,
+    company_name: str = "the company",
+    role_title: str = "the position",
+    tone: str = "formal",
+    external_id: str | None = None,
+):
+    with open("data/sample_resume.txt", "r", encoding="utf-8") as f:
+        resume_text = f.read()
+
+    initial_state = {
+        "resume_text": resume_text,
+        "job_description": job_description,
+        "company_name": company_name,
+        "role_title": role_title,
+        "tone": tone,
+        "external_id": external_id,
+        "match_score": None,
+        "missing_keywords": None,
+        "tailored_resume": None,
+        "cover_letter": None,
+        "ats_result": None,
+        "interview_prep": None,
+        "tracker_result": None,
+    }
+
+    final_state = await pipeline.ainvoke(initial_state)
+    return final_state
+
