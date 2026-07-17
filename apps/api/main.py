@@ -6,6 +6,7 @@ from agents.analyzer_agent import analyze_match
 from agents.resume_agent import tailor_resume
 from agents.cover_letter_agent import generate_cover_letter
 from agents.ats_agent import score_ats_compatibility
+from agents.interview_agent import generate_interview_prep
 
 settings = get_settings()
 
@@ -96,4 +97,12 @@ async def run_ats_score(job_description: str):
         resume_text = f.read()
 
     result = await score_ats_compatibility(resume_text, job_description)
+    return result
+
+@app.post("/agents/interview-prep")
+async def run_interview_prep(job_description: str):
+    with open("data/sample_resume.txt", "r", encoding="utf-8") as f:
+        resume_text = f.read()
+
+    result = await generate_interview_prep(resume_text, job_description)
     return result
