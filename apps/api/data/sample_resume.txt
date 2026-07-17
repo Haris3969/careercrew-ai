@@ -1,0 +1,15 @@
+Haris - Data Science Student
+
+Skills: Python, SQL, Machine Learning, NLP, RAG systems, FAISS, LangChain, LangGraph,
+Power BI, Excel, Data Visualization, Vector Search, LLM Integration, FastAPI, React, Next.js
+
+Experience:
+- Rapide Technologies (Intern): Built NLP pipelines, RAG systems, LLM integration, vector search
+- Excelerate (Intern): Power BI dashboards, Excel automation, Python data analysis, stakeholder communication
+
+Projects:
+- CourseMentorAI: RAG-based academic assistant using FAISS, CrossEncoder reranker, Streamlit
+- FlowForge: Full-stack SaaS workflow automation platform (Next.js, Prisma, Supabase, Stripe)
+- Computer Vision Fitness App: Real-time pose detection and form correction using joint-angle math
+
+Education: BS Data Science, FAST-NUCES Lahore
