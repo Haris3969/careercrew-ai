@@ -4,6 +4,7 @@ from core.config import get_settings
 from agents.discovery_agent import discover_jobs
 from agents.analyzer_agent import analyze_match
 from agents.resume_agent import tailor_resume
+from agents.cover_letter_agent import generate_cover_letter
 
 settings = get_settings()
 
@@ -63,4 +64,27 @@ async def run_tailor(job_description: str):
         "match_score": analysis["match_score"],
         "missing_keywords": analysis["missing_keywords"],
         "tailored_resume": tailored_resume,
+    }
+
+@app.post("/agents/cover-letter")
+async def run_cover_letter(
+    job_description: str,
+    company_name: str = "the company",
+    role_title: str = "the position",
+    tone: str = "formal",
+):
+    with open("data/sample_resume.txt", "r", encoding="utf-8") as f:
+        resume_text = f.read()
+
+    letter = await generate_cover_letter(
+        resume_text=resume_text,
+        job_description=job_description,
+        company_name=company_name,
+        role_title=role_title,
+        tone=tone,
+    )
+
+    return {
+        "tone_used": tone,
+        "cover_letter": letter,
     }
