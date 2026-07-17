@@ -7,6 +7,7 @@ from agents.resume_agent import tailor_resume
 from agents.cover_letter_agent import generate_cover_letter
 from agents.ats_agent import score_ats_compatibility
 from agents.interview_agent import generate_interview_prep
+from agents.tracker_agent import update_job_status, get_jobs_by_status
 
 settings = get_settings()
 
@@ -106,3 +107,14 @@ async def run_interview_prep(job_description: str):
 
     result = await generate_interview_prep(resume_text, job_description)
     return result
+
+@app.patch("/jobs/{external_id}/status")
+async def set_job_status(external_id: str, new_status: str, match_score: float | None = None):
+    result = await update_job_status(external_id, new_status, match_score)
+    return result
+
+
+@app.get("/jobs")
+async def list_jobs(status: str | None = None):
+    jobs = await get_jobs_by_status(status)
+    return {"count": len(jobs), "jobs": jobs}
