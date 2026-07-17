@@ -1,0 +1,30 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: #14161C;
+  --color-panel: #1C1F27;
+  --color-panel-raised: #232733;
+  --color-hairline: #2A2E38;
+  --color-amber: #F2A93B;
+  --color-amber-dim: #4A3A1E;
+  --color-green: #6EE7A8;
+  --color-green-dim: #1E3A2E;
+  --color-red: #F26D5B;
+  --color-text-primary: #EDEFF3;
+  --color-text-secondary: #8A8F9C;
+  --color-text-muted: #565B68;
+
+  --font-display: var(--font-space-grotesk);
+  --font-body: var(--font-plex-sans);
+  --font-mono: var(--font-plex-mono);
+}
+
+body {
+  background: var(--color-background);
+  color: var(--color-text-primary);
+}
+
+::selection {
+  background: var(--color-amber-dim);
+  color: var(--color-amber);
+}
